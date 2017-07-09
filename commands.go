@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/xlab/at/pdu"
-	"github.com/xlab/at/sms"
-	"github.com/xlab/at/util"
+	"github.com/dgoujard/at/pdu"
+	"github.com/dgoujard/at/util"
+	"github.com/dgoujard/at/sms"
 )
 
 // DeviceProfile hides the device-specific implementation
@@ -35,7 +35,7 @@ type DeviceProfile interface {
 
 // DeviceE173 returns an instance of DeviceProfile implementation for Huawei E173,
 // it's also the default one.
-func DeviceE173() DeviceProfile {
+func Sim800L() DeviceProfile {
 	return &DefaultProfile{}
 }
 
@@ -49,9 +49,11 @@ type DefaultProfile struct {
 func (p *DefaultProfile) Init(d *Device) (err error) {
 	p.dev = d
 	p.dev.Send(NoopCmd) // kinda flush
-	if err = p.COPS(true, true); err != nil {
+	/*if err = p.COPS(true, true); err != nil {
 		return errors.New("at init: unable to adjust the format of operator's name")
 	}
+
+	//Didn't work with SIM800L
 	var info *SystemInfoReport
 	if info, err = p.SYSINFO(); err != nil {
 		return errors.New("at init: unable to read system info")
@@ -72,8 +74,9 @@ func (p *DefaultProfile) Init(d *Device) (err error) {
 	}
 	if p.dev.State.IMEI, err = p.IMEI(); err != nil {
 		return errors.New("at init: unable to read modem's IMEI code")
-	}
-	if err = p.CMGF(false); err != nil {
+	}*/
+
+	/*if err = p.CMGF(false); err != nil {
 		return errors.New("at init: unable to switch message format to PDU")
 	}
 	if err = p.CPMS(MemoryTypes.NvRAM, MemoryTypes.NvRAM, MemoryTypes.NvRAM); err != nil {
@@ -81,6 +84,12 @@ func (p *DefaultProfile) Init(d *Device) (err error) {
 	}
 	if err = p.CNMI(1, 1, 0, 0, 0); err != nil {
 		return errors.New("at init: unable to turn on message notifications")
+	}*/
+	if err = p.CPMS(MemoryTypes.Sim, MemoryTypes.Sim, MemoryTypes.Sim); err != nil {
+		return errors.New("at init: unable to set messages storage")
+	}
+	if err = p.CMGF(false); err != nil {
+		return errors.New("at init: unable to switch message format to PDU")
 	}
 	var octets map[uint64][]byte
 	if octets, err = p.CMGL(MessageFlags.Any); err != nil {
@@ -91,6 +100,9 @@ func (p *DefaultProfile) Init(d *Device) (err error) {
 		if _, err := msg.ReadFrom(oct); err != nil {
 			return errors.New("at init: error while parsing message inbox")
 		}
+		d.messages <- &msg
+
+
 		if err := p.CMGD(n, DeleteOptions.Index); err != nil {
 			return errors.New("at init: error while cleaning message inbox")
 		}
@@ -311,14 +323,18 @@ func (p *DefaultProfile) CMGL(flag Opt) (octets map[uint64][]byte, err error) {
 		if len(fields) < 4 {
 			return nil, ErrParseReport
 		}
+
 		n, err := strconv.ParseUint(fields[0], 10, 16)
 		if err != nil {
 			return nil, ErrParseReport
 		}
+
 		var oct []byte
+
 		if oct, err = util.Bytes(lines[i+1]); err != nil {
 			return nil, ErrParseReport
 		}
+
 		octets[n] = oct
 	}
 	return

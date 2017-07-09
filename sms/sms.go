@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/xlab/at/pdu"
+	"github.com/dgoujard/at/pdu"
 )
 
 // Common errors.
@@ -232,7 +232,6 @@ func (s *Message) PDU() (int, []byte, error) {
 		buf.WriteByte(byte(len(octets)))
 		buf.Write(octets)
 	}
-
 	switch s.Type {
 	case MessageTypes.Deliver:
 		var sms smsDeliver

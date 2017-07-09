@@ -5,16 +5,16 @@ Package at is a framework for communication with AT-compatible devices like Huaw
 ### Installation
 
 ```
-go get github.com/xlab/at
+go get github.com/dgoujard/at
 ```
 
-Full documentation: [godoc](https://godoc.org/github.com/xlab/at).
+Full documentation: [godoc](https://godoc.org/github.com/dgoujard/at).
 
 ### Features
 
 This framework includes facilities for device monitoring, sending and receiving AT-commands, encoding and decoding SMS messages from or to PDU octet representation (as specified in [3GPP TS 23.040]). An example of incoming SMS monitor application is given in [example/daemon].
 
-[example/daemon]: https://github.com/xlab/at/blob/master/example/daemon
+[example/daemon]: https://github.com/dgoujard/at/blob/master/example/daemon
 [3GPP TS 23.040]: http://www.etsi.org/deliver/etsi_ts/123000_123099/123040/11.05.00_60/ts_123040v110500p.pdf
 
 ### Examples

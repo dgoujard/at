@@ -8,8 +8,9 @@ import (
 	"time"
 
 	"github.com/tarm/goserial"
-	"github.com/xlab/at/pdu"
-	"github.com/xlab/at/sms"
+	"github.com/dgoujard/at/pdu"
+	"github.com/dgoujard/at/sms"
+	"fmt"
 )
 
 // BaudRate defines the default speed of serial connection.
@@ -441,6 +442,8 @@ func (d *Device) SendSMS(text string, address sms.PhoneNumber) (err error) {
 	if err != nil {
 		return err
 	}
+	fmt.Println("passe",octets)
+
 	err = d.Commands.CMGS(n, octets)
 	return
 }
